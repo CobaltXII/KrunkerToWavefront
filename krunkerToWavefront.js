@@ -126,11 +126,40 @@ function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
 	var emissiveB = emissive & 0xFF * 10;
 	var info = "";
 	info += "newmtl cmtl" + materialCount + "\n";
-	info += "Kd " + (colorR / 255.0 + 1e-5) + " " + (colorG / 255.0 + 1e-5) + " " + (colorB / 255.0 + 1e-5) + "\n";
+	info += "Kd " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	info += "Ke " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	info += "Ka " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	return info;
 }
+
+// ID constants.
+const idCube = 0;                   // Implemented and working
+const idCrate = 1;                  // Model
+const idBarrel = 2;                 // Model
+const idLadder = 3;                 // NEEDS TO BE IMPLEMENTED
+const idPlane = 4;                  // NEEDS TO BE IMPLEMENTED
+const idSpawnPoint = 5;             // Never going to be used here
+const idCameraPosition = 6;         // Never going to be used here
+const idVehicle = 7;                // Model
+const idStack = 8;                  // Model
+const idRamp = 9;                   // NEEDS TO BE IMPLEMENTED
+const idScoreZone = 10;             // Never going to be used here
+const idBillboard = 11;             // NEEDS TO BE IMPLEMENTED
+const idDeathZone = 12;             // Never going to be used here
+const idParticles = 13;             // Never going to be used here
+const idObjective = 14;             // Never going to be used here
+const idTree = 15;                  // Model
+const idCone = 16;                  // Model
+const idContainer = 17;             // Model
+const idGrass = 18;                 // Model
+const idContainerr = 19;            // Model
+const idAcidbarrel = 20;            // Model
+const idDoor = 21;                  // Model
+const idWindow = 22;                // Model
+const idFlag = 23;                  // Never going to be used here
+const idWater = 24;                 // NEEDS TO BE IMPLEMENTED
+const idCheckPoint = 25;            // Never going to be used here
+const idWeaponPickup = 26;          // Never going to be used here
 
 // Convert a Krunker.io map into a Wavefront object (.obj) file.
 function krunkerToWavefront(map) {
@@ -152,10 +181,9 @@ function krunkerToWavefront(map) {
 			continue;
 		}
 
-		// Only cubes, planes and ramps are supported.
+		// Ignore unsupported or unused objects.
 		if (object.hasOwnProperty("id")) {
-			if (object.id != 4 &&
-				object.id != 9) {
+			if (object.id != idCube) {
 				continue;
 			}
 		}
