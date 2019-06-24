@@ -51,3 +51,92 @@ function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
 	info += "Ka " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	return info;
 }
+
+// Convert a Krunker.io map into a Wavefront object (.obj) file.
+function krunkerToWavefront(map) {
+	var mapName = map.name;
+
+	var vertexInfo = "";
+	var faceInfo = "";
+	var materialInfo = "";
+
+	var vertexCount = 0;
+	var faceCount = 0;
+	var materialCount = 0;
+
+	for (var i = 0; i < map.objects.length; i++) {
+		var object = map.objects[i];
+
+		// Ignore invisible objects.
+		if (object.hasOwnProperty("v") && object.v == 1) {
+			continue;
+		}
+
+		// Only cubes, planes and ramps are supported.
+		if (object.hasOwnProperty("id")) {
+			if (object.id != 4 &&
+				object.id != 9) {
+				continue;
+			}
+		}
+
+		var isObjectColored = false;
+		var colorInteger = 0;
+		if (object.hasOwnProperty("c")) {
+			// Annoyingly, not all colors are stored in the same manner. Some
+			// are stored as integers while others are stored as hex codes.
+			if (typeof object.c == "string") {
+				isObjectColored = true;
+				if (object.c[0] == "#") {
+					object.c = object.c.substr(1);
+				}
+				colorInteger = parseInt(object.c, 16);
+			} else if (typeof object.c == "number") {
+				isObjectColored = true;
+				colorInteger = object.c;
+			}
+		}
+
+		var isObjectEmissive = false;
+		var emissiveInteger = 0;
+		if (object.hasOwnProperty("e")) {
+			if (typeof object.e == "string") {
+				isObjectEmissive = true;
+				if (object.e[0] == "#") {
+					object.e = object.e.substr(1);
+				}
+				emissiveInteger = parseInt(object.e, 16);
+			} else if (typeof object.e == "number") {
+				isObjectEmissive = true;
+				emissiveInteger = object.e;
+			}
+		}
+
+		if (isObjectColored) {
+			if (isObjectEmissive) {
+				materialInfo += generateEmissiveColorMaterialInfo(colorInteger, emissiveInteger, materialCount);
+				faceInfo += "usemtl cmtl" + materialCount + "\n";
+				materialCount++;
+			} else {
+				materialInfo += generateColorMaterialInfo(colorInteger, materialCount);
+				faceInfo += "usemtl cmtl" + materialCount + "\n";
+				materialCount++;
+			}
+		}
+
+		object.p[0] -= object.s[0] / 2.0;
+		object.p[2] -= object.s[2] / 2.0;
+
+		vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
+		faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
+		vertexCount += 8;
+		faceCount += 6;
+	}
+
+	var objectInfo = vertexInfo + faceInfo;
+
+	return {
+		objFile: objectInfo,
+		mtlFile: materialInfo
+	};
+}
