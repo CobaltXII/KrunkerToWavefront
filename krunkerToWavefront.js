@@ -24,3 +24,14 @@ function generateCubeFaceInfo(cube, vertexCount, faceCount) {
 	info += "f " + (vertexCount + 3) + " " + (vertexCount + 0) + " " + (vertexCount + 1) + " " + (vertexCount + 5) + "\n";
 	return info;
 }
+
+// Generate material information for a specific color.
+function generateColorMaterialInfo(color, materialCount) {
+	var colorR = color >> 16 & 0xFF;
+	var colorG = color >> 8 & 0xFF;
+	var colorB = color & 0xFF;
+	var info = "";
+	info += "newmtl cmtl" + materialCount + "\n";
+	info += "Kd " + (colorR / 255.0) + " " + (colorG / 255.0) + " " + (colorB / 255.0) + "\n";
+	return info;
+}
