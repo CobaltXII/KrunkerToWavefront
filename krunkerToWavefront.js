@@ -140,3 +140,21 @@ function krunkerToWavefront(map) {
 		mtlFile: materialInfo
 	};
 }
+
+const fs = require("fs");
+
+var mapBurg = JSON.parse(fs.readFileSync("burg.json"));
+var mapLittletown = JSON.parse(fs.readFileSync("littletown.json"));
+var mapSandstorm = JSON.parse(fs.readFileSync("sandstorm.json"));
+var mapSubzero = JSON.parse(fs.readFileSync("subzero.json"));
+var mapKanji = JSON.parse(fs.readFileSync("kanji.json"));
+
+var maps = [mapBurg, mapLittletown, mapSandstorm, mapSubzero, mapKanji];
+
+for (var i = 0; i < maps.length; i++) {
+	var map = maps[i];
+	var data = krunkerToWavefront(map);
+	data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
+	fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
+	fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
+}
