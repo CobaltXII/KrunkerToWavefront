@@ -7,21 +7,22 @@ Convert Krunker.io maps to Wavefront .obj and .mtl files
 # Features
 
 Currently, KrunkerToWavefront supports the following features
-- conversion of cubes
-- conversion of colors
-- conversion of planes
-- conversion of emissive materials
-- conversion of diffuse materials
-- conversion of rotated objects
+- .obj conversion of cubes
+- .obj conversion of planes
+- .obj conversion of water
+- .obj conversion of rotated objects
+- .mtl conversion of diffuse materials
+- .mtl conversion of emissive materials
+- .mtl conversion of opacity
 
 In the future, I would like to add support for the following features
-- conversion of models like cars and barrels
-- conversion of ramps
-
-I do not plan to add the following features, nor any features not listed above
-- conversion of textures
-- conversion of sky colors
-- conversion of objectives, flags, etc.
+- .obj conversion of ladders
+- .obj conversion of ramps
+- .obj conversion of barrels
+- .obj conversion of billboards
+- .obj conversion of models
+- .mtl conversion of textured materials
+- .mtl conversion of textured models
 
 # Contributing
 
