@@ -24,6 +24,16 @@ function zRotate(angle) {
 		[0.0, 0.0, 1.0]
 	];
 }
+
+// Multiply a vector with a matrix.
+function vectorMultiplyMatrix(vec, mat) {
+	return [
+		mat[0][0] * vec[0] + mat[0][1] * vec[1] + mat[0][2] * vec[2],
+		mat[1][0] * vec[0] + mat[1][1] * vec[1] + mat[1][2] * vec[2],
+		mat[2][0] * vec[0] + mat[2][1] * vec[1] + mat[2][2] * vec[2],
+	];
+}
+
 // Generate the vertex information for a cube.
 function generateCubeVertexInfo(cube, vertexCount, faceCount) {
 	var info = "";
