@@ -35,3 +35,19 @@ function generateColorMaterialInfo(color, materialCount) {
 	info += "Kd " + (colorR / 255.0) + " " + (colorG / 255.0) + " " + (colorB / 255.0) + "\n";
 	return info;
 }
+
+// Generate material information for a specific emissive color.
+function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
+	var colorR = color >> 16 & 0xFF;
+	var colorG = color >> 8 & 0xFF;
+	var colorB = color & 0xFF;
+	var emissiveR = emissive >> 16 & 0xFF * 10;
+	var emissiveG = emissive >> 8 & 0xFF * 10;
+	var emissiveB = emissive & 0xFF * 10;
+	var info = "";
+	info += "newmtl cmtl" + materialCount + "\n";
+	info += "Kd " + (colorR / 255.0 + 1e-5) + " " + (colorG / 255.0 + 1e-5) + " " + (colorB / 255.0 + 1e-5) + "\n";
+	info += "Ke " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
+	info += "Ka " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
+	return info;
+}
