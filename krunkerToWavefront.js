@@ -137,7 +137,7 @@ const idCube = 0;                   // Implemented and working
 const idCrate = 1;                  // Model
 const idBarrel = 2;                 // Model
 const idLadder = 3;                 // NEEDS TO BE IMPLEMENTED
-const idPlane = 4;                  // NEEDS TO BE IMPLEMENTED
+const idPlane = 4;                  // Implemented and working
 const idSpawnPoint = 5;             // Never going to be used here
 const idCameraPosition = 6;         // Never going to be used here
 const idVehicle = 7;                // Model
@@ -182,10 +182,13 @@ function krunkerToWavefront(map) {
 		}
 
 		// Ignore unsupported or unused objects.
+		var id = 0;
 		if (object.hasOwnProperty("id")) {
-			if (object.id != idCube) {
+			if (object.id != idCube &&
+				object.id != idPlane) {
 				continue;
 			}
+			id = object.id;
 		}
 
 		var isObjectColored = false;
@@ -232,10 +235,12 @@ function krunkerToWavefront(map) {
 			}
 		}
 
-		vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
-		faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
-		vertexCount += 8;
-		faceCount += 6;
+		if (id == idCube || id == idPlane) {
+			vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
+			faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
+			vertexCount += 8;
+			faceCount += 6;
+		}
 	}
 
 	var objectInfo = vertexInfo + faceInfo;
