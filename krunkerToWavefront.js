@@ -105,6 +105,53 @@ function generateCubeFaceInfo(cube, vertexCount, faceCount) {
 	return info;
 }
 
+// Generate the vertex information for a ramp.
+function generateRampVertexInfo(ramp, vertexCount, faceCount) {
+	// Ramp directions are as follows
+	//     0: +x
+	//     1: +z
+	//     2: -x
+	//     3: -z
+	var info = "";
+	var p1, p2, p3, p4;
+	if (ramp.d == 0) {
+		p0 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p1 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] - ramp.s[2] / 2.0];
+		p2 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p3 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] - ramp.s[2] / 2.0];
+	} else if (ramp.d == 2) {
+		p0 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p1 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] - ramp.s[2] / 2.0];
+		p2 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p3 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] - ramp.s[2] / 2.0];
+	} else if (ramp.d == 1) {
+		p0 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] - ramp.s[2] / 2.0];
+		p1 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] - ramp.s[2] / 2.0];
+		p2 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p3 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] + ramp.s[2] / 2.0];
+	} else {
+		p0 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p1 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1], ramp.p[2] + ramp.s[2] / 2.0];
+		p2 = [ramp.p[0] + ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] - ramp.s[2] / 2.0];
+		p3 = [ramp.p[0] - ramp.s[0] / 2.0, ramp.p[1] + ramp.s[1], ramp.p[2] - ramp.s[2] / 2.0];
+	}
+	info += "v " + p0[0] + " " + p0[1] + " " + p0[2] + "\n";
+	info += "v " + p1[0] + " " + p1[1] + " " + p1[2] + "\n";
+	info += "v " + p2[0] + " " + p2[1] + " " + p2[2] + "\n";
+	info += "v " + p3[0] + " " + p3[1] + " " + p3[2] + "\n";
+	return info;
+}
+
+// Generate the face information for a ramp.
+function generateRampFaceInfo(ramp, vertexCount, faceCount) {
+	var info = "";
+	vertexCount++;
+	// Both faces are generated to counteract backface culling.
+	info += "f " + (vertexCount + 0) + " " + (vertexCount + 1) + " " + (vertexCount + 2) + " " + (vertexCount + 3) + "\n";
+	info += "f " + (vertexCount + 3) + " " + (vertexCount + 2) + " " + (vertexCount + 1) + " " + (vertexCount + 0) + "\n";
+	return info;
+}
+
 // Generate material information for a specific color.
 function generateColorMaterialInfo(color, materialCount) {
 	var colorR = color >> 16 & 0xFF;
@@ -142,7 +189,7 @@ const idSpawnPoint = 5;             // Never going to be used here
 const idCameraPosition = 6;         // Never going to be used here
 const idVehicle = 7;                // Model
 const idStack = 8;                  // Model
-const idRamp = 9;                   // NEEDS TO BE IMPLEMENTED
+const idRamp = 9;                   // Implemented and working
 const idScoreZone = 10;             // Never going to be used here
 const idBillboard = 11;             // NEEDS TO BE IMPLEMENTED
 const idDeathZone = 12;             // Never going to be used here
@@ -185,7 +232,8 @@ function krunkerToWavefront(map) {
 		var id = 0;
 		if (object.hasOwnProperty("id")) {
 			if (object.id != idCube &&
-				object.id != idPlane) {
+				object.id != idPlane &&
+				object.id != idRamp) {
 				continue;
 			}
 			id = object.id;
@@ -244,6 +292,11 @@ function krunkerToWavefront(map) {
 			faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
 			vertexCount += 8;
 			faceCount += 6;
+		} else if (id == idRamp) {
+			vertexInfo += generateRampVertexInfo(object, vertexCount, faceCount);
+			faceInfo += generateRampFaceInfo(object, vertexCount, faceCount);
+			vertexCount += 4;
+			faceCount += 2;
 		}
 	}
 
