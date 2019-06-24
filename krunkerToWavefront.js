@@ -37,14 +37,58 @@ function vectorMultiplyMatrix(vec, mat) {
 // Generate the vertex information for a cube.
 function generateCubeVertexInfo(cube, vertexCount, faceCount) {
 	var info = "";
-	info += "v " + (cube.p[0]            ) + " " + (cube.p[1]            ) + " " + (cube.p[2]            ) + "\n";
-	info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1]            ) + " " + (cube.p[2]            ) + "\n";
-	info += "v " + (cube.p[0]            ) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2]            ) + "\n";
-	info += "v " + (cube.p[0]            ) + " " + (cube.p[1]            ) + " " + (cube.p[2] + cube.s[2]) + "\n";
-	info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2]            ) + "\n";
-	info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1]            ) + " " + (cube.p[2] + cube.s[2]) + "\n";
-	info += "v " + (cube.p[0]            ) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2] + cube.s[2]) + "\n";
-	info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2] + cube.s[2]) + "\n";
+	if (cube.hasOwnProperty("r")) {
+		// Cube is rotated.
+		var p0 = [cube.p[0]             - cube.s[0] / 2.0, cube.p[1]            , cube.p[2]             -  cube.s[2] / 2.0];
+		var p1 = [cube.p[0] + cube.s[0] - cube.s[0] / 2.0, cube.p[1]            , cube.p[2]             -  cube.s[2] / 2.0];
+		var p2 = [cube.p[0]             - cube.s[0] / 2.0, cube.p[1] + cube.s[1], cube.p[2]             -  cube.s[2] / 2.0];
+		var p3 = [cube.p[0]             - cube.s[0] / 2.0, cube.p[1]            , cube.p[2] + cube.s[2] -  cube.s[2] / 2.0];
+		var p4 = [cube.p[0] + cube.s[0] - cube.s[0] / 2.0, cube.p[1] + cube.s[1], cube.p[2]             -  cube.s[2] / 2.0];
+		var p5 = [cube.p[0] + cube.s[0] - cube.s[0] / 2.0, cube.p[1]            , cube.p[2] + cube.s[2] -  cube.s[2] / 2.0];
+		var p6 = [cube.p[0]             - cube.s[0] / 2.0, cube.p[1] + cube.s[1], cube.p[2] + cube.s[2] -  cube.s[2] / 2.0];
+		var p7 = [cube.p[0] + cube.s[0] - cube.s[0] / 2.0, cube.p[1] + cube.s[1], cube.p[2] + cube.s[2] -  cube.s[2] / 2.0];
+		var p = [p0, p1, p2, p3, p4, p5, p6, p7];
+
+		// Offset the cube to object coordinates.
+		for (var i = 0; i < p.length; i++) {
+			for (var q = 0; q < 3; q++) {
+				p[i][q] -= cube.p[q];
+			}
+		}
+
+		// Generate the rotation matrices.
+		var rotX = xRotate(cube.r[0]);
+		var rotY = yRotate(cube.r[1]);
+		var rotZ = zRotate(cube.r[2]);
+
+		// Rotate the cube.
+		for (var i = 0; i < p.length; i++) {
+			p[i] = vectorMultiplyMatrix(vectorMultiplyMatrix(vectorMultiplyMatrix(p[i], rotX), rotY), rotZ);
+		}
+
+		// Offset the cube back to world coordinates.
+		for (var i = 0; i < p.length; i++) {
+			for (var q = 0; q < 3; q++) {
+				p[i][q] += cube.p[q];
+			}
+		}
+
+		for (var i = 0; i < p.length; i++) {
+			info += "v " + p[i][0] + " " + p[i][1] + " " + p[i][2] + "\n";
+		}
+	} else {
+		// Cube is axis-aligned.
+		cube.p[0] -= cube.s[0] / 2.0;
+		cube.p[2] -= cube.s[2] / 2.0;
+		info += "v " + (cube.p[0]            ) + " " + (cube.p[1]            ) + " " + (cube.p[2]            ) + "\n";
+		info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1]            ) + " " + (cube.p[2]            ) + "\n";
+		info += "v " + (cube.p[0]            ) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2]            ) + "\n";
+		info += "v " + (cube.p[0]            ) + " " + (cube.p[1]            ) + " " + (cube.p[2] + cube.s[2]) + "\n";
+		info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2]            ) + "\n";
+		info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1]            ) + " " + (cube.p[2] + cube.s[2]) + "\n";
+		info += "v " + (cube.p[0]            ) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2] + cube.s[2]) + "\n";
+		info += "v " + (cube.p[0] + cube.s[0]) + " " + (cube.p[1] + cube.s[1]) + " " + (cube.p[2] + cube.s[2]) + "\n";
+	}
 	return info;
 }
 
@@ -159,9 +203,6 @@ function krunkerToWavefront(map) {
 				materialCount++;
 			}
 		}
-
-		object.p[0] -= object.s[0] / 2.0;
-		object.p[2] -= object.s[2] / 2.0;
 
 		vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
 		faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);

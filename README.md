@@ -12,6 +12,7 @@ Currently, KrunkerToWavefront supports the following features
 - conversion of planes
 - conversion of emissive materials
 - conversion of diffuse materials
+- conversion of rotated objects
 
 In the future, I would like to add support for the following features
 - conversion of models like cars and barrels
