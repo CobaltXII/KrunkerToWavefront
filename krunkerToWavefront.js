@@ -143,18 +143,27 @@ function krunkerToWavefront(map) {
 
 const fs = require("fs");
 
-var mapBurg = JSON.parse(fs.readFileSync("burg.json"));
-var mapLittletown = JSON.parse(fs.readFileSync("littletown.json"));
-var mapSandstorm = JSON.parse(fs.readFileSync("sandstorm.json"));
-var mapSubzero = JSON.parse(fs.readFileSync("subzero.json"));
-var mapKanji = JSON.parse(fs.readFileSync("kanji.json"));
+if (process.argv.length == 3) {
+	var map = JSON.parse(fs.readFileSync(process.argv[2]));
 
-var maps = [mapBurg, mapLittletown, mapSandstorm, mapSubzero, mapKanji];
-
-for (var i = 0; i < maps.length; i++) {
-	var map = maps[i];
 	var data = krunkerToWavefront(map);
 	data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
-	fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
-	fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
+	fs.writeFileSync(map.name + ".obj", data.objFile);
+	fs.writeFileSync(map.name + ".mtl", data.mtlFile);
+} else {
+	var mapBurg = JSON.parse(fs.readFileSync("burg.json"));
+	var mapLittletown = JSON.parse(fs.readFileSync("littletown.json"));
+	var mapSandstorm = JSON.parse(fs.readFileSync("sandstorm.json"));
+	var mapSubzero = JSON.parse(fs.readFileSync("subzero.json"));
+	var mapKanji = JSON.parse(fs.readFileSync("kanji.json"));
+
+	var maps = [mapBurg, mapLittletown, mapSandstorm, mapSubzero, mapKanji];
+
+	for (var i = 0; i < maps.length; i++) {
+		var map = maps[i];
+		var data = krunkerToWavefront(map);
+		data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
+		fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
+		fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
+	}
 }
