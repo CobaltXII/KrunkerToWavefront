@@ -235,6 +235,10 @@ function krunkerToWavefront(map) {
 			}
 		}
 
+		if (object.hasOwnProperty("opacity")) {
+			materialInfo += "d " + object.opacity + "\n";
+		}
+
 		if (id == idCube || id == idPlane || id == idWater) {
 			vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
 			faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
