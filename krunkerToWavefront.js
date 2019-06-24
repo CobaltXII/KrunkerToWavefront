@@ -1,3 +1,29 @@
+// Generate an X rotation matrix.
+function xRotate(angle) {
+	return [
+		[1.0, 0.0, 0.0],
+		[0.0, Math.cos(angle), -Math.sin(angle)],
+		[0.0, Math.sin(angle), Math.cos(angle)]
+	];
+}
+
+// Generate an Y rotation matrix.
+function yRotate(angle) {
+	return [
+		[Math.cos(angle), 0.0, Math.sin(angle)],
+		[0.0, 1.0, 0.0],
+		[-Math.sin(angle), 0.0, Math.cos(angle)]
+	];
+}
+
+// Generate an Z rotation matrix.
+function zRotate(angle) {
+	return [
+		[Math.cos(angle), -Math.sin(angle), 0.0],
+		[Math.sin(angle), Math.cos(angle), 0.0],
+		[0.0, 0.0, 1.0]
+	];
+}
 // Generate the vertex information for a cube.
 function generateCubeVertexInfo(cube, vertexCount, faceCount) {
 	var info = "";
