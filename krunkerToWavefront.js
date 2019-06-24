@@ -157,7 +157,7 @@ const idAcidbarrel = 20;            // Model
 const idDoor = 21;                  // Model
 const idWindow = 22;                // Model
 const idFlag = 23;                  // Never going to be used here
-const idWater = 24;                 // NEEDS TO BE IMPLEMENTED
+const idWater = 24;                 // Implemented and working
 const idCheckPoint = 25;            // Never going to be used here
 const idWeaponPickup = 26;          // Never going to be used here
 
@@ -235,7 +235,7 @@ function krunkerToWavefront(map) {
 			}
 		}
 
-		if (id == idCube || id == idPlane) {
+		if (id == idCube || id == idPlane || id == idWater) {
 			vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
 			faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
 			vertexCount += 8;
