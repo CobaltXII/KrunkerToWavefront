@@ -237,16 +237,10 @@ const idCrate = 1;                  // Model
 const idBarrel = 2;                 // Model
 const idLadder = 3;                 // NEEDS TO BE IMPLEMENTED
 const idPlane = 4;                  // Implemented and working
-const idSpawnPoint = 5;             // Never going to be used here
-const idCameraPosition = 6;         // Never going to be used here
 const idVehicle = 7;                // Model
 const idStack = 8;                  // Model
 const idRamp = 9;                   // Implemented and working
-const idScoreZone = 10;             // Never going to be used here
 const idBillboard = 11;             // NEEDS TO BE IMPLEMENTED
-const idDeathZone = 12;             // Never going to be used here
-const idParticles = 13;             // Never going to be used here
-const idObjective = 14;             // Never going to be used here
 const idTree = 15;                  // Model
 const idCone = 16;                  // Model
 const idContainer = 17;             // Model
@@ -255,10 +249,7 @@ const idContainerr = 19;            // Model
 const idAcidbarrel = 20;            // Model
 const idDoor = 21;                  // Model
 const idWindow = 22;                // Model
-const idFlag = 23;                  // Never going to be used here
 const idWater = 24;                 // Implemented and working
-const idCheckPoint = 25;            // Never going to be used here
-const idWeaponPickup = 26;          // Never going to be used here
 
 // Convert a Krunker.io map into a Wavefront object (.obj) file.
 function krunkerToWavefront(map) {
