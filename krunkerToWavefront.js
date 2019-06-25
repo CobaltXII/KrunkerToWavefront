@@ -1,3 +1,55 @@
+const fs = require("fs");
+
+// Load a Wavefront object file (.obj).
+function loadWavefrontObj(path) {
+	var obj = {
+		v: [], vt: [], vn: [], f: []
+	};
+
+	// This is required due to Krunker.io having the origin of an object not
+	// at it's center but at the center of it's bottom.
+	var lowest = 1e+10;
+
+	var lines = fs.readFileSync(path).toString().split("\n");
+	for (var i = 0; i < lines.length; i++) {
+		var line = lines[i];
+		if (line.startsWith("vt")) {
+			// Vertex texture coordinate.
+			var args = line.split(" ");
+			obj.vt.push([parseFloat(args[1]), parseFloat(args[2]), parseFloat(args[3])]);
+		} else if (line.startsWith("vn")) {
+			// Vertex normal.
+			var args = line.split(" ");
+			obj.vn.push([parseFloat(args[1]), parseFloat(args[2]), parseFloat(args[3])]);
+		} else if (line.startsWith("v")) {
+			// Vertex.
+			var args = line.split(" ");
+			obj.v.push([parseFloat(args[1]), parseFloat(args[2]), parseFloat(args[3])]);
+			if (parseFloat(args[2]) < lowest) {
+				lowest = parseFloat(args[2]);
+			}
+		} else if (line.startsWith("f")) {
+			// Face.
+			var args = line.split(" ");
+			args.shift();
+			var vertices = [];
+			for (var j = 0; j < args.length; j++) {
+				var vtx = args[j].split("/");
+				vertices.push([parseInt(vtx[0]), parseInt(vtx[1]), parseInt(vtx[2])]);
+			}
+			obj.f.push(vertices);
+		}
+	}
+
+	// This is required due to Krunker.io having the origin of an object not
+	// at it's center but at the center of it's bottom.
+	for (var i = 0; i < obj.v.length; i++) {
+		obj.v[i][1] -= lowest;
+	}
+
+	return obj;
+}
+
 // Generate an X rotation matrix.
 function xRotate(angle) {
 	return [
