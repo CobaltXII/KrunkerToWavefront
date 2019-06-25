@@ -251,7 +251,37 @@ const idDoor = 21;                  // Model
 const idWindow = 22;                // Model
 const idWater = 24;                 // Implemented and working
 
-// Convert a Krunker.io map into a Wavefront object (.obj) file.
+// All model IDs.
+var modelIDs = [
+	idCrate, idBarrel, 
+	idVehicle, idStack, 
+	idTree, idCone, 
+	idContainer, idGrass, 
+	idContainerr, idAcidbarrel, 
+	idDoor, idWindow
+];
+
+// All model paths.
+var modelPaths = [
+	"crate_0", "barrel_0", 
+	"vehicle_0", "stack_0", 
+	"tree_0", "cone_0", 
+	"container_0", "grass_0", 
+	"containerr_0", "acidbarrel_0", 
+	"door_0", "window_0"
+];
+
+// Returns true if an ID is a model ID.
+function isModelID(id) {
+	return modelIDs.includes(id);
+}
+
+// Gets the model index of a model ID.
+function getModelIndex(id) {
+	return modelIDs.indexOf(id);
+}
+
+// Convert a Krunker.io map into a Wavefront object file (.obj and .mtl).
 function krunkerToWavefront(map) {
 	var mapName = map.name;
 
