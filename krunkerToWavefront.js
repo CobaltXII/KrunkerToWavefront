@@ -461,14 +461,14 @@ if (process.argv.length == 3) {
 
 	var data = krunkerToWavefront(map);
 	data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
-	fs.writeFileSync(map.name + ".obj", data.objFile);
-	fs.writeFileSync(map.name + ".mtl", data.mtlFile);
+	fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
+	fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
 } else {
-	var mapBurg = JSON.parse(fs.readFileSync("burg.json"));
-	var mapLittletown = JSON.parse(fs.readFileSync("littletown.json"));
-	var mapSandstorm = JSON.parse(fs.readFileSync("sandstorm.json"));
-	var mapSubzero = JSON.parse(fs.readFileSync("subzero.json"));
-	var mapKanji = JSON.parse(fs.readFileSync("kanji.json"));
+	var mapBurg = JSON.parse(fs.readFileSync("maps/burg.json"));
+	var mapLittletown = JSON.parse(fs.readFileSync("maps/littletown.json"));
+	var mapSandstorm = JSON.parse(fs.readFileSync("maps/sandstorm.json"));
+	var mapSubzero = JSON.parse(fs.readFileSync("maps/subzero.json"));
+	var mapKanji = JSON.parse(fs.readFileSync("maps/kanji.json"));
 
 	var maps = [mapBurg, mapLittletown, mapSandstorm, mapSubzero, mapKanji];
 
