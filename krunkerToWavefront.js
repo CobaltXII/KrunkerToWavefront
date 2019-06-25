@@ -283,8 +283,8 @@ function krunkerToWavefront(map) {
 			}
 		}
 
-		if (object.hasOwnProperty("opacity")) {
-			materialInfo += "d " + object.opacity + "\n";
+		if (object.hasOwnProperty("o")) {
+			materialInfo += "d " + object.o + "\n";
 		}
 
 		if (id == idCube || id == idPlane || id == idWater) {
