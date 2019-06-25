@@ -286,12 +286,29 @@ function krunkerToWavefront(map) {
 	var mapName = map.name;
 
 	var vertexInfo = "";
+	var textureInfo = "";
+	var normalInfo = "";
 	var faceInfo = "";
 	var materialInfo = "";
 
 	var vertexCount = 0;
+	var textureCount = 0;
+	var normalCount = 0;
 	var faceCount = 0;
 	var materialCount = 0;
+
+	// Load the models.
+	var modelObjs = [];
+	for (var i = 0; i < modelPaths.length; i++) {
+		modelObjs.push(loadWavefrontObj("models/" + modelPaths[i] + ".obj"));
+	}
+
+	// Generate the model materials.
+	for (var i = 0; i < modelPaths.length; i++) {
+		materialInfo += "newmtl mmtl" + i + "\n";
+		materialInfo += "map_Kd textures/" + modelPaths[i] + ".png\n";
+		materialCount++;
+	}
 
 	for (var i = 0; i < map.objects.length; i++) {
 		var object = map.objects[i];
@@ -306,82 +323,128 @@ function krunkerToWavefront(map) {
 		if (object.hasOwnProperty("id")) {
 			if (object.id != idCube &&
 				object.id != idPlane &&
-				object.id != idRamp) {
+				object.id != idRamp &&
+				!isModelID(object.id)) {
 				continue;
 			}
 			id = object.id;
 		}
 
-		var isObjectColored = false;
-		var colorInteger = 0;
-		if (object.hasOwnProperty("c")) {
-			// Annoyingly, not all colors are stored in the same manner. Some
-			// are stored as integers while others are stored as hex codes.
-			if (typeof object.c == "string") {
-				isObjectColored = true;
-				if (object.c[0] == "#") {
-					object.c = object.c.substr(1);
+		if (isModelID(object.id)) {
+			// The object is a model.
+			var modelIndex = getModelIndex(object.id);
+			var modelObj = modelObjs[modelIndex];
+
+			// Paste the model into the output.
+			faceInfo += "usemtl mmtl" + modelIndex + "\n";
+			for (var j = 0; j < modelObj.f.length; j++) {
+				var f = modelObj.f[j];
+				var vertices = [];
+				for (var k = 0; k < f.length; k++) {
+					var v = f[k];
+					vertices.push((v[0] + vertexCount) + "/" + (v[1] + textureCount) + "/" + (v[2] + normalCount));
 				}
-				colorInteger = parseInt(object.c, 16);
-			} else if (typeof object.c == "number") {
-				isObjectColored = true;
-				colorInteger = object.c;
-			}
-		}
-
-		var isObjectEmissive = false;
-		var emissiveInteger = 0;
-		if (object.hasOwnProperty("e")) {
-			if (typeof object.e == "string") {
-				isObjectEmissive = true;
-				if (object.e[0] == "#") {
-					object.e = object.e.substr(1);
+				faceInfo += "f";
+				for (var k = 0; k < vertices.length; k++) {
+					faceInfo += " " + vertices[k];
 				}
-				emissiveInteger = parseInt(object.e, 16);
-			} else if (typeof object.e == "number") {
-				isObjectEmissive = true;
-				emissiveInteger = object.e;
+				faceInfo += "\n";
+				faceCount++;
 			}
-		}
+			for (var j = 0; j < modelObj.v.length; j++) {
+				var v = [modelObj.v[j][0], modelObj.v[j][1], modelObj.v[j][2]];
 
-		if (isObjectColored) {
-			if (isObjectEmissive) {
-				materialInfo += generateEmissiveColorMaterialInfo(colorInteger, emissiveInteger, materialCount);
-				faceInfo += "usemtl cmtl" + materialCount + "\n";
-				materialCount++;
-			} else {
-				materialInfo += generateColorMaterialInfo(colorInteger, materialCount);
-				faceInfo += "usemtl cmtl" + materialCount + "\n";
-				materialCount++;
+				// Translate the vertex to world space.
+				v[0] *= object.s[0] / 2.0;
+				v[1] *= object.s[1] / 2.0;
+				v[2] *= object.s[2] / 2.0;
+				v[0] += object.p[0];
+				v[1] += object.p[1];
+				v[2] += object.p[2];
+
+				vertexInfo += "v " + v[0] + " " + v[1] + " " + v[2] + "\n";
+				vertexCount++;
 			}
-		}
+			for (var j = 0; j < modelObj.vt.length; j++) {
+				var vt = modelObj.vt[j];
+				textureInfo += "vt " + vt[0] + " " + vt[1] + " " + vt[2] + "\n";
+				textureCount++;
+			}
+			for (var j = 0; j < modelObj.vn.length; j++) {
+				var vn = modelObj.vn[j];
+				normalInfo += "vn " + vn[0] + " " + vn[1] + " " + vn[2] + "\n";
+				normalCount++;
+			}
+		} else {
+			var isObjectColored = false;
+			var colorInteger = 0;
+			if (object.hasOwnProperty("c")) {
+				// Annoyingly, not all colors are stored in the same manner. Some
+				// are stored as integers while others are stored as hex codes.
+				if (typeof object.c == "string") {
+					isObjectColored = true;
+					if (object.c[0] == "#") {
+						object.c = object.c.substr(1);
+					}
+					colorInteger = parseInt(object.c, 16);
+				} else if (typeof object.c == "number") {
+					isObjectColored = true;
+					colorInteger = object.c;
+				}
+			}
 
-		if (object.hasOwnProperty("o")) {
-			materialInfo += "d " + object.o + "\n";
-		}
+			var isObjectEmissive = false;
+			var emissiveInteger = 0;
+			if (object.hasOwnProperty("e")) {
+				if (typeof object.e == "string") {
+					isObjectEmissive = true;
+					if (object.e[0] == "#") {
+						object.e = object.e.substr(1);
+					}
+					emissiveInteger = parseInt(object.e, 16);
+				} else if (typeof object.e == "number") {
+					isObjectEmissive = true;
+					emissiveInteger = object.e;
+				}
+			}
 
-		if (id == idCube || id == idPlane || id == idWater) {
-			vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
-			faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
-			vertexCount += 8;
-			faceCount += 6;
-		} else if (id == idRamp) {
-			vertexInfo += generateRampVertexInfo(object, vertexCount, faceCount);
-			faceInfo += generateRampFaceInfo(object, vertexCount, faceCount);
-			vertexCount += 4;
-			faceCount += 2;
+			if (isObjectColored) {
+				if (isObjectEmissive) {
+					materialInfo += generateEmissiveColorMaterialInfo(colorInteger, emissiveInteger, materialCount);
+					faceInfo += "usemtl cmtl" + materialCount + "\n";
+					materialCount++;
+				} else {
+					materialInfo += generateColorMaterialInfo(colorInteger, materialCount);
+					faceInfo += "usemtl cmtl" + materialCount + "\n";
+					materialCount++;
+				}
+			}
+
+			if (object.hasOwnProperty("o")) {
+				materialInfo += "d " + object.o + "\n";
+			}
+
+			if (id == idCube || id == idPlane || id == idWater) {
+				vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
+				faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
+				vertexCount += 8;
+				faceCount += 6;
+			} else if (id == idRamp) {
+				vertexInfo += generateRampVertexInfo(object, vertexCount, faceCount);
+				faceInfo += generateRampFaceInfo(object, vertexCount, faceCount);
+				vertexCount += 4;
+				faceCount += 2;
+			}
 		}
 	}
 
-	var objectInfo = vertexInfo + faceInfo;
+	var objectInfo = vertexInfo + textureInfo + normalInfo + faceInfo;
 
 	return {
 		objFile: objectInfo,
 		mtlFile: materialInfo
 	};
 }
-
-const fs = require("fs");
 
 if (process.argv.length == 3) {
 	var map = JSON.parse(fs.readFileSync(process.argv[2]));
