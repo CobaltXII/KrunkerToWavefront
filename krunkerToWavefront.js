@@ -6,9 +6,9 @@ function loadWavefrontObj(path) {
 		v: [], vt: [], vn: [], f: []
 	};
 
-	// This is required due to Krunker.io having the origin of an object not
-	// at it's center but at the center of it's bottom.
-	var lowest = 1e+10;
+	var lo_x = 1e+10, hi_x = -1e+10;
+	var lo_y = 1e+10, hi_y = -1e+10;
+	var lo_z = 1e+10, hi_z = -1e+10;
 
 	var lines = fs.readFileSync(path).toString().split("\n");
 	for (var i = 0; i < lines.length; i++) {
@@ -24,10 +24,16 @@ function loadWavefrontObj(path) {
 		} else if (line.startsWith("v")) {
 			// Vertex.
 			var args = line.split(" ");
-			obj.v.push([parseFloat(args[1]), parseFloat(args[2]), parseFloat(args[3])]);
-			if (parseFloat(args[2]) < lowest) {
-				lowest = parseFloat(args[2]);
-			}
+			var vx = parseFloat(args[1]);
+			var vy = parseFloat(args[2]);
+			var vz = parseFloat(args[3]);
+			obj.v.push([vx, vy, vz]);
+			if (vx < lo_x) {lo_x = vx;}
+			if (vy < lo_y) {lo_y = vy;}
+			if (vz < lo_z) {lo_z = vz;}
+			if (vx > hi_x) {hi_x = vx;}
+			if (vy > hi_y) {hi_y = vy;}
+			if (vz > hi_z) {hi_z = vz;}
 		} else if (line.startsWith("f")) {
 			// Face.
 			var args = line.split(" ");
@@ -41,10 +47,14 @@ function loadWavefrontObj(path) {
 		}
 	}
 
-	// This is required due to Krunker.io having the origin of an object not
-	// at it's center but at the center of it's bottom.
+	var len_x = hi_x - lo_x / 2.0;
+	var len_y = hi_y - lo_y;
+	var len_z = hi_z - lo_z / 2.0;
 	for (var i = 0; i < obj.v.length; i++) {
-		obj.v[i][1] -= lowest;
+		obj.v[i][1] -= lo_y;
+		obj.v[i][0] /= len_x;
+		obj.v[i][1] /= len_y;
+		obj.v[i][2] /= len_z;
 	}
 
 	return obj;
@@ -355,9 +365,9 @@ function krunkerToWavefront(map) {
 				var v = [modelObj.v[j][0], modelObj.v[j][1], modelObj.v[j][2]];
 
 				// Translate the vertex to world space.
-				v[0] *= object.s[0] / 2.0;
-				v[1] *= object.s[1] / 2.0;
-				v[2] *= object.s[2] / 2.0;
+				v[0] *= object.s[0] / 1.5;
+				v[1] *= object.s[1];
+				v[2] *= object.s[2] / 1.5;
 				v[0] += object.p[0];
 				v[1] += object.p[1];
 				v[2] += object.p[2];
