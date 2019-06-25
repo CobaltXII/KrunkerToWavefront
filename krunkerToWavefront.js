@@ -173,7 +173,7 @@ function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
 	var emissiveB = emissive & 0xFF * 10;
 	var info = "";
 	info += "newmtl cmtl" + materialCount + "\n";
-	info += "Kd " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
+	info += "Kd " + (colorR / 255.0 + 1e-5) + " " + (colorG / 255.0 + 1e-5) + " " + (colorB / 255.0 + 1e-5) + "\n";
 	info += "Ke " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	info += "Ka " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	return info;
