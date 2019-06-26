@@ -230,11 +230,12 @@ function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
 	var colorR = color >> 16 & 0xFF;
 	var colorG = color >> 8 & 0xFF;
 	var colorB = color & 0xFF;
-	var emissiveR = emissive >> 16 & 0xFF * 10;
-	var emissiveG = emissive >> 8 & 0xFF * 10;
-	var emissiveB = emissive & 0xFF * 10;
+	var emissiveR = emissive >> 16 & 0xFF;
+	var emissiveG = emissive >> 8 & 0xFF;
+	var emissiveB = emissive & 0xFF;
 	var info = "";
 	info += "newmtl EmissiveMaterial" + materialCount + "\n";
+	info += "Kd " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	info += "Ke " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	return info;
 }
