@@ -339,6 +339,7 @@ function krunkerToWavefront(map) {
 			if (object.id != idCube &&
 				object.id != idPlane &&
 				object.id != idRamp &&
+				object.id != idBillboard &&
 				!isModelID(object.id)) {
 				continue;
 			}
@@ -359,7 +360,7 @@ function krunkerToWavefront(map) {
 			var rotZ = zRotate(object.r[2]);
 
 			// Paste the model into the output.
-			faceInfo += "usemtl mmtl" + modelIndex + "\n";
+			faceInfo += "usemtl ModelMaterial" + modelIndex + "\n";
 			for (var j = 0; j < modelObj.f.length; j++) {
 				var f = modelObj.f[j];
 				var vertices = [];
@@ -404,55 +405,64 @@ function krunkerToWavefront(map) {
 			// 	normalCount++;
 			// }
 		} else {
-			var isObjectColored = false;
-			var colorInteger = 0;
-			if (object.hasOwnProperty("c")) {
-				// Annoyingly, not all colors are stored in the same manner. Some
-				// are stored as integers while others are stored as hex codes.
-				if (typeof object.c == "string") {
-					isObjectColored = true;
-					if (object.c[0] == "#") {
-						object.c = object.c.substr(1);
+			if (object.id == idBillboard) {
+				faceInfo += "usemtl BillboardMaterial" + object.bb + "\n";
+			} else {
+				var isObjectColored = false;
+				var colorInteger = 0;
+				if (object.hasOwnProperty("c")) {
+					// Annoyingly, not all colors are stored in the same manner. Some
+					// are stored as integers while others are stored as hex codes.
+					if (typeof object.c == "string") {
+						isObjectColored = true;
+						if (object.c[0] == "#") {
+							object.c = object.c.substr(1);
+						}
+						colorInteger = parseInt(object.c, 16);
+					} else if (typeof object.c == "number") {
+						isObjectColored = true;
+						colorInteger = object.c;
 					}
-					colorInteger = parseInt(object.c, 16);
-				} else if (typeof object.c == "number") {
-					isObjectColored = true;
-					colorInteger = object.c;
 				}
-			}
 
-			var isObjectEmissive = false;
-			var emissiveInteger = 0;
-			if (object.hasOwnProperty("e")) {
-				if (typeof object.e == "string") {
-					isObjectEmissive = true;
-					if (object.e[0] == "#") {
-						object.e = object.e.substr(1);
+				var isObjectEmissive = false;
+				var emissiveInteger = 0;
+				if (object.hasOwnProperty("e")) {
+					if (typeof object.e == "string") {
+						isObjectEmissive = true;
+						if (object.e[0] == "#") {
+							object.e = object.e.substr(1);
+						}
+						emissiveInteger = parseInt(object.e, 16);
+					} else if (typeof object.e == "number") {
+						isObjectEmissive = true;
+						emissiveInteger = object.e;
 					}
-					emissiveInteger = parseInt(object.e, 16);
-				} else if (typeof object.e == "number") {
-					isObjectEmissive = true;
-					emissiveInteger = object.e;
+				}
+
+				if (isObjectColored) {
+					if (isObjectEmissive) {
+						materialInfo += generateEmissiveColorMaterialInfo(colorInteger, emissiveInteger, materialCount);
+						faceInfo += "usemtl EmissiveMaterial" + materialCount + "\n";
+						materialCount++;
+					} else {
+						materialInfo += generateColorMaterialInfo(colorInteger, materialCount);
+						faceInfo += "usemtl ColorMaterial" + materialCount + "\n";
+						materialCount++;
+					}
+				}
+
+				if (object.hasOwnProperty("o")) {
+					materialInfo += "d " + object.o + "\n";
 				}
 			}
 
-			if (isObjectColored) {
-				if (isObjectEmissive) {
-					materialInfo += generateEmissiveColorMaterialInfo(colorInteger, emissiveInteger, materialCount);
-					faceInfo += "usemtl cmtl" + materialCount + "\n";
-					materialCount++;
-				} else {
-					materialInfo += generateColorMaterialInfo(colorInteger, materialCount);
-					faceInfo += "usemtl cmtl" + materialCount + "\n";
-					materialCount++;
+			if (id == idCube || id == idPlane || id == idWater || id == idBillboard) {
+				if (id == idBillboard) {
+					object.s[0] += 0.1;
+					object.s[1] += 0.1;
+					object.s[2] += 0.1;
 				}
-			}
-
-			if (object.hasOwnProperty("o")) {
-				materialInfo += "d " + object.o + "\n";
-			}
-
-			if (id == idCube || id == idPlane || id == idWater) {
 				vertexInfo += generateCubeVertexInfo(object, vertexCount, faceCount);
 				faceInfo += generateCubeFaceInfo(object, vertexCount, faceCount);
 				vertexCount += 8;
