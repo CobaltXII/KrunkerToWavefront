@@ -220,7 +220,7 @@ function generateColorMaterialInfo(color, materialCount) {
 	var colorG = color >> 8 & 0xFF;
 	var colorB = color & 0xFF;
 	var info = "";
-	info += "newmtl cmtl" + materialCount + "\n";
+	info += "newmtl ColorMaterial" + materialCount + "\n";
 	info += "Kd " + (colorR / 255.0) + " " + (colorG / 255.0) + " " + (colorB / 255.0) + "\n";
 	return info;
 }
@@ -234,7 +234,7 @@ function generateEmissiveColorMaterialInfo(color, emissive, materialCount) {
 	var emissiveG = emissive >> 8 & 0xFF * 10;
 	var emissiveB = emissive & 0xFF * 10;
 	var info = "";
-	info += "newmtl cmtl" + materialCount + "\n";
+	info += "newmtl EmissiveMaterial" + materialCount + "\n";
 	info += "Ke " + (emissiveR / 255.0) + " " + (emissiveG / 255.0) + " " + (emissiveB / 255.0) + "\n";
 	return info;
 }
@@ -313,8 +313,15 @@ function krunkerToWavefront(map) {
 
 	// Generate the model materials.
 	for (var i = 0; i < modelPaths.length; i++) {
-		materialInfo += "newmtl mmtl" + i + "\n";
+		materialInfo += "newmtl ModelMaterial" + i + "\n";
 		materialInfo += "map_Kd textures/" + modelPaths[i] + ".png\n";
+		materialCount++;
+	}
+
+	// Generate the billboard materials.
+	for (var i = 0; i < 4; i++) {
+		materialInfo += "newmtl BillboardMaterial" + i + "\n";
+		materialInfo += "map_Kd textures/b_" + (i + 1) + ".png\n";
 		materialCount++;
 	}
 
