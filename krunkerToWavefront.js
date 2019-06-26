@@ -345,6 +345,14 @@ function krunkerToWavefront(map) {
 			var modelIndex = getModelIndex(object.id);
 			var modelObj = modelObjs[modelIndex];
 
+			// Generate the rotation matrices.
+			if (!object.hasOwnProperty("r")) {
+				object.r = [0.0, 0.0, 0.0];
+			}
+			var rotX = xRotate(object.r[0]);
+			var rotY = yRotate(object.r[1]);
+			var rotZ = zRotate(object.r[2]);
+
 			// Paste the model into the output.
 			faceInfo += "usemtl mmtl" + modelIndex + "\n";
 			for (var j = 0; j < modelObj.f.length; j++) {
@@ -364,10 +372,15 @@ function krunkerToWavefront(map) {
 			for (var j = 0; j < modelObj.v.length; j++) {
 				var v = [modelObj.v[j][0], modelObj.v[j][1], modelObj.v[j][2]];
 
-				// Translate the vertex to world space.
+				// Scale the vertex.
 				v[0] *= object.s[0] / 1.5;
 				v[1] *= object.s[1];
 				v[2] *= object.s[2] / 1.5;
+
+				// Rotate the vertex.
+				v = vectorMultiplyMatrix(vectorMultiplyMatrix(vectorMultiplyMatrix(v, rotZ), rotY), rotX);
+
+				// Translate the vertex to world space.
 				v[0] += object.p[0];
 				v[1] += object.p[1];
 				v[2] += object.p[2];
