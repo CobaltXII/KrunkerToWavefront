@@ -125,7 +125,7 @@ function generateCubeVertexInfo(cube, vertexCount, faceCount) {
 
 		// Rotate the cube.
 		for (var i = 0; i < p.length; i++) {
-			p[i] = vectorMultiplyMatrix(vectorMultiplyMatrix(vectorMultiplyMatrix(p[i], rotX), rotY), rotZ);
+			p[i] = vectorMultiplyMatrix(vectorMultiplyMatrix(vectorMultiplyMatrix(p[i], rotZ), rotY), rotX);
 		}
 
 		// Offset the cube back to world coordinates.
