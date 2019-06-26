@@ -358,7 +358,7 @@ function krunkerToWavefront(map) {
 				var vertices = [];
 				for (var k = 0; k < f.length; k++) {
 					var v = f[k];
-					vertices.push((v[0] + vertexCount) + "/" + (v[1] + textureCount) + "/" + (v[2] + normalCount));
+					vertices.push((v[0] + vertexCount) + "/" + (v[1] + textureCount));
 				}
 				faceInfo += "f";
 				for (var k = 0; k < vertices.length; k++) {
@@ -391,11 +391,11 @@ function krunkerToWavefront(map) {
 				textureInfo += "vt " + vt[0] + " " + vt[1] + " " + vt[2] + "\n";
 				textureCount++;
 			}
-			for (var j = 0; j < modelObj.vn.length; j++) {
-				var vn = modelObj.vn[j];
-				normalInfo += "vn " + vn[0] + " " + vn[1] + " " + vn[2] + "\n";
-				normalCount++;
-			}
+			// for (var j = 0; j < modelObj.vn.length; j++) {
+			// 	var vn = modelObj.vn[j];
+			// 	normalInfo += "vn " + vn[0] + " " + vn[1] + " " + vn[2] + "\n";
+			// 	normalCount++;
+			// }
 		} else {
 			var isObjectColored = false;
 			var colorInteger = 0;
