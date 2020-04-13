@@ -486,12 +486,32 @@ function krunkerToWavefront(map) {
 }
 
 if (process.argv.length == 3) {
+	if(process.argv[2] == "all"){
+		fs.readdir('./maps/', (error, files) => {
+			if (error) {
+				console.log("Error: ",error)
+				return;
+			}
+			const jsonfile = files.filter(f => {
+				return f.split('.').pop() === 'json';
+			});
+			if (jsonfile.length <= 0) {
+				logger.info('There aren\'t any maps!');
+			}
+			jsonfile.forEach((file, i) => {
+				var map = JSON.parse(fs.readFileSync(`./maps/${file}`));
+				var data = krunkerToWavefront(map);
+				data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
+				fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
+				fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
+			});
+		});
+	}else{
 	var map = JSON.parse(fs.readFileSync(process.argv[2]));
-
 	var data = krunkerToWavefront(map);
 	data.objFile = "mtllib " + map.name + ".mtl\n" + data.objFile;
 	fs.writeFileSync("wavefront/" + map.name + ".obj", data.objFile);
-	fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);
+	fs.writeFileSync("wavefront/" + map.name + ".mtl", data.mtlFile);}
 } else {
 	var mapBurg = JSON.parse(fs.readFileSync("maps/burg.json"));
 	var mapLittletown = JSON.parse(fs.readFileSync("maps/littletown.json"));
