@@ -42,11 +42,16 @@ You will then get .obj and .mtl files for the 5 default maps, which can be found
 ```bash
 git clone https://github.com/CobaltXII/KrunkerToWavefront.git
 cd KrunkerToWavefront/
-node krunkerToWavefront.js <map>
+node krunkerToWavefront.js <map.json>
 ```
 
 You will then get .obj and .mtl files for the given map, which can be found in the wavefront/ directory.
 
+To convert all the JSONs in the `/maps` folder, use these commands:
+Add new JSON files to the maps folder(You can get the txt file from the Krunker Editor's Export, just rename it to .json from .txt).
+```bash
+node krunkerToWavefront.js all
+```
 # License
 
 It's under the MIT License, so do whatever you want with it, but if you use it in one of your own projects it would be nice to credit me and put a link to this repository.
